@@ -1,4 +1,4 @@
-package cn.tengshe789.redis;
+package com.miaosha.redis;
 
 public class GoodsKey extends BasePrefix{
     private GoodsKey(int expireSeconds, String prefix) {

@@ -1,4 +1,4 @@
-package cn.tengshe789.redis;
+package com.miaosha.redis;
 
 public class MiaoshaKey extends BasePrefix {
     public MiaoshaKey(String prefix) {

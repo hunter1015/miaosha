@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>注册新用户</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <!-- jquery -->
+    <script type="text/javascript" th:src="@{/js/jquery.min.js}"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" type="text/css" th:href="@{/bootstrap/css/bootstrap.min.css}" />
+    <script type="text/javascript" th:src="@{/bootstrap/js/bootstrap.min.js}"></script>
+    <!-- jquery-validator -->
+    <script type="text/javascript" th:src="@{/jquery-validation/jquery.validate.min.js}"></script>
+    <script type="text/javascript" th:src="@{/jquery-validation/localization/messages_zh.min.js}"></script>
+    <!-- layer -->
+    <script type="text/javascript" th:src="@{/layer/layer.js}"></script>
+    <!-- md5.js -->
+    <script type="text/javascript" th:src="@{/js/md5.min.js}"></script>
+    <!-- common.js -->
+    <script type="text/javascript" th:src="@{/js/common.js}"></script>
+
+</head>
+<body>
+<h3 th:text="${userModel.title}">thymeleaf默认</h3>
+<form action="/user/register" th:action="@{/user/register}" method="post" th:object="${userModel.newUser}">
+
+    <div class="form-group">
+        <div class="row">
+            <label class="form-label col-md-4">请输入用户名</label>
+            <div class="col-md-5">
+                <input id="username" name = "username" th:value="*{Username}" class="form-control" type="text" placeholder="用户名" required="true"  minlength="6" maxlength="20" />
+            </div>
+            <div class="col-md-1">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <label class="form-label col-md-4">请输入手机号码</label>
+            <div class="col-md-5">
+                <input id="mobile"  name="phonenumber" th:value="*{Password}" class="form-control" type="text" placeholder="手机号码" required="true"  minlength="11" maxlength="11" />
+            </div>
+            <div class="col-md-1">
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <div class="row">
+            <label class="form-label col-md-4">请输入密码</label>
+            <div class="col-md-5">
+                <input id="password" name="password" th:value="*{Password}" class="form-control" type="password"  placeholder="密码" required="true" minlength="6" maxlength="16" />
+            </div>
+        </div>
+        <div class="row">
+            <label class="form-label col-md-4">请再次输入密码</label>
+            <div class="col-md-5">
+                <input id="password2" name="password2" class="form-control" type="password"  placeholder="确认密码" onkeyup="validate()" ><span id="password-double-check"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-5">
+            <button class="btn btn-primary btn-block" type="reset" onclick="reset()">重置</button>
+        </div>
+        <div class="col-md-5">
+            <button id="register" class="btn btn-primary btn-block" type="submit" ><!--onclick="register()"-->注册</button>
+        </div>
+    </div>
+
+</form>
+</body>
+<script>
+    function validate() {
+
+        var pwd = $("#password").val();
+        var pwd1 = $("#password2").val();
+        <!-- 对比两次输入的密码 -->
+        if(pwd == pwd1)
+        {
+            $("#password-double-check").html("两次密码相同");
+            $("#password-double-check").css("color","green");
+            $("#register").removeAttr("disabled");
+        }
+        else {
+            $("#password-double-check").html("两次密码不相同");
+            $("#password-double-check").css("color","red")
+            $("register").attr("disabled","disabled");
+        }
+    }
+    function register(){
+        $("#registerForm").validate({
+            submitHandler:function(form){
+                doRegister();
+            }
+        });
+    }
+    function doRegister(){
+        g_showLoading();
+
+        var inputPass = $("#password").val();
+        var salt = g_passsword_salt;
+        var str = ""+salt.charAt(0)+salt.charAt(2) + inputPass +salt.charAt(5) + salt.charAt(4);
+        var password = md5(str);
+
+        $.ajax({
+            url: "/user/new-user",
+            type: "POST",
+            data:{
+                username:$("#username").val(),
+                mobile:$("#mobile").val(),
+                password: password
+            },
+            success:function(data){
+                layer.closeAll();
+                if(data.code == 0){
+                    layer.msg("成功");
+                    window.location.href="/user/info";
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error:function(){
+                layer.closeAll();
+            }
+        });
+    }
+</script>
+</html>
