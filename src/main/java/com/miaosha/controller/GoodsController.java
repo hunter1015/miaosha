@@ -121,8 +121,7 @@ public class GoodsController {
     //静态的商品的详情页
     @RequestMapping(value="/detail/{goodsId}")
     @ResponseBody
-    public Result<GoodsDetailVo> detail(User user,
-                                        @PathVariable("goodsId")long goodsId) {
+    public Result<GoodsDetailVo> detail(User user,@PathVariable("goodsId")long goodsId) {
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         long startAt = goods.getStartDate().getTime();
         long endAt = goods.getEndDate().getTime();
@@ -133,6 +132,7 @@ public class GoodsController {
             miaoshaStatus = 0;
             remainSeconds = (int)((startAt - now )/1000);
         }else  if(now > endAt){//秒杀已经结束
+            //设置秒杀状态
             miaoshaStatus = 2;
             remainSeconds = -1;
         }else {//秒杀进行中
