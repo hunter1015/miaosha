@@ -11,6 +11,8 @@ import com.miaosha.util.SpringWebContextUtil;
 import com.miaosha.vo.GoodsDetailVo;
 import com.miaosha.vo.GoodsVo;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
@@ -28,6 +30,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/goods")
 public class GoodsController {
+
+    private static Logger logger= LoggerFactory.getLogger(GoodsController.class);
     @Autowired
     UserService userService;
 
@@ -50,6 +54,7 @@ public class GoodsController {
 
     //全部商品的列表 不返回页面，直接返回HTML的代码
     @GetMapping(value = "/list",produces = "text/html")
+    @ResponseBody
     public String list(HttpServletRequest request, HttpServletResponse response, Model model, User user) {
         model.addAttribute("user", user);
         List<GoodsVo> goodsList = goodsService.listGoodsVo();
