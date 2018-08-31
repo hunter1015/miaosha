@@ -20,6 +20,7 @@ import sun.misc.BASE64Encoder;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.security.SecureRandom;
 import java.sql.Date;
 import java.util.List;
@@ -143,7 +144,7 @@ public class UserService {
      * @param loginVo
      * @return
      */
-    public boolean loginByPhone(HttpServletResponse response, LoginVoPhone loginVo){
+    public boolean loginByPhone(HttpServletRequest request,HttpServletResponse response, LoginVoPhone loginVo){
         if (loginVo==null){
             throw  new GlobleException(CodeMsg.SERVER_ERROR);
         }
@@ -164,7 +165,7 @@ public class UserService {
         //分布式session
         //生成cookie
         String token= UUIDUtil.uuid();
-        addCookie(response,token,user);
+        addCookie(request,response,token,user);
         return true;
     }
 
@@ -174,7 +175,7 @@ public class UserService {
      * @param loginVoUser
      * @return
      */
-    public boolean loginByUser(HttpServletResponse response, LoginVoUser loginVoUser){
+    public boolean loginByUser(HttpServletRequest request,HttpServletResponse response, LoginVoUser loginVoUser){
         if (loginVoUser==null){
             //接受的用户输入为空，报服务器错
             throw  new GlobleException(CodeMsg.SERVER_ERROR);
@@ -198,17 +199,20 @@ public class UserService {
         //分布式session
         //生成cookie
         String token= UUIDUtil.uuid();
-        addCookie(response,token,user);
+        addCookie(request,response,token,user);
         return true;
     }
     //生成cookie
-    private void addCookie(HttpServletResponse response, String token,User user){
-
+    private void addCookie(HttpServletRequest request,HttpServletResponse response, String token,User user){
+        HttpSession session=request.getSession();
+        session.setAttribute("cookietoken",token);
         redisService.set(UserKey.token,token,user);
         Cookie cookie=new Cookie(COOKIE_NAME_TOKEN,token);
         cookie.setMaxAge(UserKey.token.expireSeconds());//cookie有效期=userkey的有效期
         cookie.setPath("/");//设置成网站根目录
         response.addCookie(cookie);
+        userServiceLog.info("添加完cookie和session,session的key为cookietoken 值为"+token);
+
     }
 
     private boolean getCookie(HttpServletRequest request,String username){

@@ -61,11 +61,8 @@ public class UserLoginInterceptor implements HandlerInterceptor {
             //log.info("用户已登录,userName:"+userInfo.getSysUser().getUserName());
             return true;
         }else{
-            // 不存在则跳转到登录页
-            // 为了测试，打印一句话
-            System.out.println(request.getRequestURI());
-            System.out.println(request.getRequestURL().toString());
-            System.out.println("访问了test下url路径。");
+            // 不存在则跳转到登录页 测试打印
+            System.out.println("测试拦截器，获取本次request的访问路径"+request.getRequestURL().toString());
 
 
             /*log.info("尚未登录，跳转到登录界面");
@@ -85,7 +82,7 @@ public class UserLoginInterceptor implements HandlerInterceptor {
                 logger.info("尚未登录，跳转到登录界面");
                 //设置跳转
                 //response.sendRedirect(request.getContextPath()+"/login");
-                response.sendRedirect(request.getContextPath()+"signin");
+                response.sendRedirect(request.getContextPath()+"/login");
             }
             return false;
         }

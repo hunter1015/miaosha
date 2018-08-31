@@ -3,10 +3,13 @@ package com.miaosha.controller;
 import com.miaosha.entity.User;
 import com.miaosha.result.Result;
 import com.miaosha.service.UserService;
+import org.apache.catalina.servlet4preview.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpRequest;
 import org.springframework.ui.Model;
+import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -26,8 +29,9 @@ public class UserController {
     }
 
     @GetMapping("")
-    public ModelAndView hello(Model model){
-        model.addAttribute("username",userService.getUserById(20).getUsername());
+    public ModelAndView hello(HttpServletRequest httpServletRequest, Model model){
+        String username=(String)httpServletRequest.getSession().getAttribute("username");
+        model.addAttribute("username",username);
         return new ModelAndView("hello", "helloModel", model);
     }
 

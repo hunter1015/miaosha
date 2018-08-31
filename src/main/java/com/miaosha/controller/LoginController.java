@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -34,20 +35,20 @@ public class LoginController {
     }
 
     @PostMapping("do-login-phone")
-    public Result<Boolean> doLogin(HttpServletResponse response, @Valid LoginVoPhone loginVoPhone){
+    public Result<Boolean> doLogin(HttpServletRequest request,HttpServletResponse response, @Valid LoginVoPhone loginVoPhone){
         logger.info(loginVoPhone.toString());
 
-        userService.loginByPhone(response,loginVoPhone);
+        userService.loginByPhone(request,response,loginVoPhone);
         return Result.success(true);
 
     }
 
     @PostMapping("do-login-username")
-    public Result<Boolean> doLogin(HttpServletResponse response, @ModelAttribute(value = "loginVoUser") LoginVoUser loginVoUser,Model model){
+    public Result<Boolean> doLogin(HttpServletRequest request,HttpServletResponse response, @ModelAttribute(value = "loginVoUser") LoginVoUser loginVoUser,Model model){
 
         //logger.info();
         //userService.
-        boolean loginsuccess=userService.loginByUser(response,loginVoUser);
+        boolean loginsuccess=userService.loginByUser(request,response,loginVoUser);
         return Result.success(loginsuccess);
 
 

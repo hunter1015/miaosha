@@ -13,7 +13,7 @@ public class LoginAdapter implements WebMvcConfigurer {
     /**
      * 设置不需要登录拦截的url:登录注册和验证码
      */
-    final String[] notLoginInterceptPaths = {"/signin","/login/**","/index/**","/register/**","/kaptcha.jpg/**","/kaptcha/**"};
+    final String[] notLoginInterceptPaths = {"/signin","/login/**","/index/**","/user/register/","/kaptcha.jpg/**","/kaptcha/**","/test/**","/error/**"};
     //"/", "/login/**", "/person/**", "/register/**", "/validcode", "/captchaCheck", "/file/**", "/contract/htmltopdf", "/questions/**", "/payLog/**", "/error/**" };
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
