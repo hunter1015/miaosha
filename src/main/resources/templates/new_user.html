@@ -69,9 +69,16 @@
             <button id="register" class="btn btn-primary btn-block" type="submit" ><!--onclick="register()"-->注册</button>
         </div>
     </div>
-
 </form>
+<h3 th:text="${error}" th:bgcolor="red">默认信息</h3>
 </body>
+<script th:inline="javascript" l>
+
+    var message = [[${message}]];
+    console.log(message);
+
+
+</script>
 <script>
     function validate() {
 

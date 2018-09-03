@@ -1,11 +1,13 @@
 package com.miaosha.interceptor;
 
+import com.miaosha.util.CookieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,6 +41,26 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         }
 
 
+
+
+
+
+        //打印目前cookie状态和session状态
+        Cookie[] cookies = request.getCookies();
+        if(null!=cookies){
+            int i=1;
+            for(Cookie cookie1 : cookies){
+                logger.info("目前已存Cookie "+i+" 名为"+cookie1.getName()+" 值为"+cookie1.getValue());
+                i++;
+            }
+        }
+        HttpSession sessionpre = request.getSession();
+        logger.info("目前已存session为"+sessionpre.getAttribute("cookietoken")+" 值为");
+
+
+
+
+        Cookie cookie= CookieUtil.getCookieByName(request,"token");
         //得到session，如果登录了，会把用户信息存进session
         HttpSession session=request.getSession(true);
 

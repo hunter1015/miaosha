@@ -39,15 +39,55 @@ public class UserController {
     public ModelAndView createForm(Model model) {
         model.addAttribute("newUser", new User());
         model.addAttribute("title", "注册新用户");
+        model.addAttribute("message", "");
         return new ModelAndView("new_user", "userModel", model);
     }
+
+
+
     @PostMapping("/register")
-    public ModelAndView createUser(User user, Model model){
-        logger.info(user.getUsername());
+    private ModelAndView createUser(User user, Model model){
+        //logger.info(user.getUsername());
         user.setRegisterDate(new Date(System.currentTimeMillis()));
-        userService.newUser(user);
+        boolean ifsucc=userService.newUser(user);
+        if(ifsucc) {
+            model.addAttribute("username", user.getUsername());
+            return new ModelAndView("redirect:/hello","helloModel",model);
+            //show("hello", "helloModel", model);
+        }else {
+            model.addAttribute("error","用户重名");
+            return createForm(model);
+            //show("new_user", "userModel", model);
+        }
+    }
+
+
+/*    private ModelAndView show(String html,String modelName,Model model){
+
+        return new ModelAndView(html,modelName,model);
+
+    }*/
+
+
+/*
+    private ModelAndView createUser(User user, Model model){
+        //logger.info(user.getUsername());
+        //user.setRegisterDate(new Date(System.currentTimeMillis()));
+       // boolean ifsucc=userService.newUser(user);
         model.addAttribute("username",user.getUsername());
         //return new ModelAndView("redirect:/hello","helloModel",model);
         return new ModelAndView("hello","helloModel",model);
     }
+
+    @PostMapping("/register")
+    public void checkUser(User user,Model model){
+        user.setRegisterDate(new Date(System.currentTimeMillis()));
+        boolean ifsucc=userService.newUser(user);
+
+        if (ifsucc){
+            createUser(user, model);
+        }else {
+            model.addAttribute("message","创建用户失败！");
+        }
+    }*/
 }

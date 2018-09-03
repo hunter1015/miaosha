@@ -23,7 +23,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.security.SecureRandom;
 import java.sql.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 import static com.miaosha.util.MD5Util.inputPassToDBPass;
@@ -183,12 +185,20 @@ public class UserService {
 
         String username = loginVoUser.getUsername();
         String inputPass = loginVoUser.getPassword();
+
+
         //判断用户号是否存在
         User user = getUserByName(username);
-        //getCookie(response,username);
         if(user==null){
             throw  new GlobleException(CodeMsg.MOBILE_NOT_EXIST);
         }
+
+        //验证是否有已存在Cookie
+        if (getCookie(request,username))
+            return true;
+
+
+
         //验证密码
         String dbPass = user.getPassword();
         String saltDB = user.getSalt();
@@ -205,8 +215,15 @@ public class UserService {
     //生成cookie
     private void addCookie(HttpServletRequest request,HttpServletResponse response, String token,User user){
         HttpSession session=request.getSession();
-        session.setAttribute("cookietoken",token);
+        String username=user.getUsername();
+
+        //设置session和值  记录的是单纯的 名称+token值  让无法判断是某个用户的
+        session.setAttribute(COOKIE_NAME_TOKEN+"-"+username,token);
+
+        //redis保存
         redisService.set(UserKey.token,token,user);
+
+        //cookie添加
         Cookie cookie=new Cookie(COOKIE_NAME_TOKEN,token);
         cookie.setMaxAge(UserKey.token.expireSeconds());//cookie有效期=userkey的有效期
         cookie.setPath("/");//设置成网站根目录
@@ -216,9 +233,13 @@ public class UserService {
     }
 
     private boolean getCookie(HttpServletRequest request,String username){
+        //获取名为“token”的cookie，只能有一个？？
         Cookie cookie=CookieUtil.getCookieByName(request,COOKIE_NAME_TOKEN);
         if (cookie!=null) {
+            //获取具体的token值
             String token = cookie.getValue();
+
+            //从redis里直接找对应本token对应的username，也就是说用户名和token的对应关系最后是在redis记录
             String cookieuser = redisService.get(UserKey.token, token, String.class);
             if (cookieuser != null) {
                 return username == cookieuser;
