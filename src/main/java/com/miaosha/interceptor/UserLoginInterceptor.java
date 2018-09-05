@@ -1,8 +1,13 @@
 package com.miaosha.interceptor;
 
+import com.miaosha.entity.User;
+import com.miaosha.redis.RedisService;
+import com.miaosha.redis.UserKey;
 import com.miaosha.util.CookieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,6 +24,9 @@ import java.util.Set;
 public class UserLoginInterceptor implements HandlerInterceptor {
 
     private static Logger logger = LoggerFactory.getLogger(UserLoginInterceptor.class);
+
+    @Autowired
+    RedisService redisService;
 
     /**
      * 当访问path不在排除的路径集合中，会触发拦截器首先进入prehandle方法，对路径进行进一步筛选和处理，结合session等
@@ -58,9 +66,21 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         logger.info("目前已存session为"+sessionpre.getAttribute("cookietoken")+" 值为");
 
 
+        //判断是否拦截的前提是，获取到当前cookie在session中能找到
+
+        //获取名为“token”的cookie，只能有一个？？
+        Cookie cookie=CookieUtil.getCookieByName(request,"token");
+        boolean findflag=false;
+        if (cookie!=null) {
+            //获取具体的token值
+            String token = cookie.getValue();
+            findflag=redisService.exists(UserKey.token, token);
+        }
 
 
-        Cookie cookie= CookieUtil.getCookieByName(request,"token");
+        //源码的处理方式
+
+        /*Cookie cookie= CookieUtil.getCookieByName(request,"token");
         //得到session，如果登录了，会把用户信息存进session
         HttpSession session=request.getSession(true);
 
@@ -68,19 +88,20 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         Object user=session.getAttribute("username");
         //List<User> users =  (List<User>) session.getAttribute("userList");
 
-        /*User userInfo = new User();
+        *//*User userInfo = new User();
         userInfo.setId(users.get(0).getId());
         userInfo.setName(users.get(0).getName());
-        userInfo.setPassword(users.get(0).getPassword());*/
+        userInfo.setPassword(users.get(0).getPassword());*//*
         //开发环节的设置，不登录的情况下自动登录
-        /*if(userInfo==null && IGNORE_LOGIN){
+        *//*if(userInfo==null && IGNORE_LOGIN){
             userInfo = sysUserService.getUserInfoByUserID(2);
             session.setAttribute(Constants.SessionKey.USER, userInfo);
-        }*/
+        }*//*
+*/
 
-
-        if(user!=null){
+        if(findflag){
             //log.info("用户已登录,userName:"+userInfo.getSysUser().getUserName());
+            logger.info("用户已登录,访问本路径，无需拦截");
             return true;
         }else{
             // 不存在则跳转到登录页 测试打印

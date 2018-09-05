@@ -193,9 +193,12 @@ public class UserService {
             throw  new GlobleException(CodeMsg.MOBILE_NOT_EXIST);
         }
 
-        //验证是否有已存在Cookie
-        if (getCookie(request,username))
+        //验证是否有已存在Cookie 配合redis
+        if (getCookie(request,username)) {
+            userServiceLog.info(username+"已经登录了");
             return true;
+        }
+
 
 
 
@@ -240,9 +243,10 @@ public class UserService {
             String token = cookie.getValue();
 
             //从redis里直接找对应本token对应的username，也就是说用户名和token的对应关系最后是在redis记录
-            String cookieuser = redisService.get(UserKey.token, token, String.class);
+            String cookieuser = redisService.get(UserKey.token, token, User.class).getUsername();
             if (cookieuser != null) {
-                return username == cookieuser;
+                userServiceLog.info("redis提取的session内容，转换为username="+cookieuser+"  传入username="+username);
+                    return username.equals(cookieuser);
             } else {
                 return false;
             }
