@@ -28,25 +28,7 @@ public class MiaoshaApplicationTests {
     }
 
 
-    @Test
-    public void Redistest() {
-        testlog.info("测试-redis连接池");
-        JedisPool jedisPool=redisPoolFactory.jedisPoolFactory();
-        //testlog.info("测试-redis连接池-JedisPool "+jedisPool.);
-        Jedis jedis = null;
-        try {
-            //jedis连接池
-            jedis = jedisPool.getResource();
-            testlog.info("测试-redis连接池-"+jedis.ping());
-        } catch (Exception e) {
-            testlog.error("测试-redis连接池-连接池报错！");
-            e.printStackTrace();
-        } finally {
-            if(jedis != null) {
-                jedis.close();
-            }
-        }
-    }
+
 
 
 }
